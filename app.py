@@ -49,23 +49,12 @@ def main():
             # アーカイブ除外
             active_boards = [b for b in boards if not b.get("closed", False)]
 
-            # ワークスペース一覧（ID -> Name）を取得
-            workspace_map = {}
-            for b in active_boards:
-                org_id = b.get("idOrganization")
-                if org_id and org_id not in workspace_map:
-                    workspace_map[org_id] = get_workspace_name(org_id, api_key, token)
-
-            # ワークスペース選択UI
-            org_options = ["すべて表示"] + list(workspace_map.values())
-            selected_ws = st.selectbox("表示するワークスペース：", org_options)
-
-            # フィルター表示
-            st.write("\n📋 該当ボード一覧：")
+            # ワークスペース名を取得して表示
+            st.write("\n📋 有効なボード一覧（アーカイブ除外・全ワークスペース）：")
             for board in active_boards:
-                ws_name = workspace_map.get(board.get("idOrganization"), "（不明）")
-                if selected_ws == "すべて表示" or selected_ws == ws_name:
-                    st.markdown(f"- **{board['name']}**（ワークスペース：{ws_name}）")
+                org_id = board.get("idOrganization")
+                ws_name = get_workspace_name(org_id, api_key, token) if org_id else "（ワークスペースなし）"
+                st.markdown(f"- **{board['name']}**（ワークスペース：{ws_name}）")
         else:
             st.error("❌ Trello APIへの接続に失敗しました。キーやトークンを再確認してください。")
 

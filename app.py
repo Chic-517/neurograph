@@ -38,8 +38,19 @@ if api_key and token:
 
     if response.status_code == 200:
         boards = response.json()
-        st.write("📋 あなたのTrelloボード一覧：")
+
+        # ✅ 表示を許可するワークスペースのID（※仮IDなので本物に置き換えてね）
+        allowed_workspace_ids = [
+            "org_id_neurograph_123",
+            "org_id_osusumeya_456"
+        ]
+
+        st.write("📋 あなたのTrelloボード一覧（ワークスペース制限 & アーカイブ除外）：")
         for board in boards:
-            st.markdown(f"- {board['name']}")
+            if (
+                board.get("idOrganization") in allowed_workspace_ids and
+                not board.get("closed", False)
+            ):
+                st.markdown(f"- {board['name']}")
     else:
         st.error("❌ Trello APIへの接続に失敗しました。キーやトークンを再確認してください。")
